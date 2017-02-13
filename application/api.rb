@@ -16,7 +16,8 @@ require 'rack/indifferent'
 require 'grape'
 require 'grape/batch'
 # Initialize the application so we can add all our components to it
-class Api < Grape::API; end
+class Api < Grape::API;
+end
 
 # Include all config files
 require 'config/sequel'
@@ -34,15 +35,20 @@ require 'active_support/core_ext'
 
 # require all models
 Dir['./application/models/*.rb'].each { |rb| require rb }
-
 Dir['./application/api_helpers/**/*.rb'].each { |rb| require rb }
+
+
 class Api < Grape::API
   version 'v1.0', using: :path
   content_type :json, 'application/json'
+  content_type :txt, 'text/plain'
   default_format :json
   prefix :api
+
+  logger PrettyLogger.logger
+
   rescue_from Grape::Exceptions::ValidationErrors do |e|
-    ret = { error_type: 'validation', errors: {} }
+    ret = {error_type: 'validation', errors: {}}
     e.each do |x, err|
       ret[:errors][x[0]] ||= []
       ret[:errors][x[0]] << err.message
@@ -50,12 +56,17 @@ class Api < Grape::API
     error! ret, 400
   end
 
+  rescue_from Exceptions::UserNotFound do |e|
+    ret = { error_type: :not_found, errors: {not_found: e.message} }
+    error! ret, 404
+  end
+
   helpers SharedParams
   helpers ApiResponse
   include Auth
 
   before do
-    authenticate!
+    authenticate! if requires_auth?
   end
 
   Dir['./application/api_entities/**/*.rb'].each { |rb| require rb }

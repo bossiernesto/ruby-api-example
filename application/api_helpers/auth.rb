@@ -8,12 +8,25 @@ class Api
 
     module HelperMethods
       def authenticate!
-        # Library to authenticate user can go here
+        begin
+          token = headers['Authorization']
+          raise Exceptions::UnauthorizedUser unless token
+
+          user_id = Backend::AuthenticationBackend.get_user_id_from_token token
+          @current_user = Backend::UserBackend.get_user user_id
+        rescue JWT::DecodeError
+          error!({error_type: :unauthorized}, :unauthorized)
+        end
       end
 
       def current_user
         @current_user
       end
+
+      def requires_auth?
+        self.route.settings[:description][:authentication_needed] rescue false
+      end
+
     end
   end
 end

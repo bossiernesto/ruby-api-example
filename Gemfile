@@ -1,5 +1,4 @@
 ruby '2.3.3'
-
 source 'https://rubygems.org'
 
 gem 'thin', '1.7.0'
@@ -20,6 +19,9 @@ gem 'hanami-validations', '0.6.0' # form validation
 gem 'dry-validation', '0.10.4' # validation methods for reform
 gem 'ability_list', '0.0.4'
 gem 'activesupport', '5.0.0'
+gem 'sidekiq', '~> 4.2.9'
+gem 'jwt', '1.5.6'
+gem 'sequel_secure_password', '0.2.14'
 
 group :development, :test do
   gem 'awesome_print', '1.7.0'

@@ -23,3 +23,7 @@ DATABASE_URL          = ENV.fetch('DATABASE_URL').freeze
 MAIL_URL              = ENV.fetch('MAIL_URL').freeze
 SYSTEM_EMAIL          = ENV.fetch('SYSTEM_EMAIL').freeze
 SITE_URL              = ENV.fetch('SITE_URL').freeze
+HMAC_SECRET           = ENV.fetch('HMAC_SECRET').freeze
+
+# Aditional Configuration variables
+AUTHENTICATION_DURATION = 4
