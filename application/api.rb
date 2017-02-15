@@ -15,6 +15,7 @@ Bundler.setup :default, RACK_ENV
 require 'rack/indifferent'
 require 'grape'
 require 'grape/batch'
+
 # Initialize the application so we can add all our components to it
 class Api < Grape::API;
 end
@@ -23,20 +24,40 @@ end
 require 'config/sequel'
 require 'config/hanami'
 require 'config/grape'
+require 'config/mailer'
 
 # require some global libs
 require 'lib/core_ext'
 require 'lib/time_formats'
 require 'lib/io'
+require 'lib/fixnum_ext'
+require 'lib/pretty_logger'
 
 # load active support helpers
 require 'active_support'
 require 'active_support/core_ext'
 
+require 'jwt'
+require 'sidekiq'
+require 'securerandom'
+
+
+#Add entities for managing input
+Dir['./application/entities/*.rb'].each { |rb| require rb }
+
 # require all models
 Dir['./application/models/*.rb'].each { |rb| require rb }
 Dir['./application/api_helpers/**/*.rb'].each { |rb| require rb }
 
+#Validators and Exceptions for
+Dir['./application/validators/*.rb'].each { |rb| require rb
+Dir['./application/backend/*.rb'].each { |rb| require rb }
+Dir['./application/exceptions/*.rb'].each { |rb| require rb }
+
+# Add the workers jobs for email notifications
+Dir['./application/workers/*.rb'].each { |rb| require rb }
+
+}
 
 class Api < Grape::API
   version 'v1.0', using: :path
@@ -56,9 +77,29 @@ class Api < Grape::API
     error! ret, 400
   end
 
+  rescue_from Exceptions::ValidationError do |e|
+    ret = {error_type: 'validation', errors: e.errors}
+    error! ret, 400
+  end
+
   rescue_from Exceptions::UserNotFound do |e|
-    ret = { error_type: :not_found, errors: {not_found: e.message} }
+    ret = {error_type: :not_found, errors: {not_found: e.message}}
     error! ret, 404
+  end
+
+  rescue_from Exceptions::UnauthorizedUser do |e|
+    ret = {error_type: :unauthorized, errors: {unauthorized: e.message}}
+    error! ret, 401
+  end
+
+  rescue_from JWT::DecodeError do |e|
+    ret = {error_type: :unauthorized, errors: {decode_error: e.message}}
+    error! ret, 401
+  end
+
+  rescue_from Exceptions::CantEditUser do |e|
+    ret = {error_type: :forbidden, errors: e.errors}
+    error! ret, 403
   end
 
   helpers SharedParams
@@ -72,6 +113,5 @@ class Api < Grape::API
   Dir['./application/api_entities/**/*.rb'].each { |rb| require rb }
   Dir['./application/api/**/*.rb'].each { |rb| require rb }
 
-  add_swagger_documentation \
-    mount_path: '/docs'
+  # add_swagger_documentation mount_path: '/docs'
 end

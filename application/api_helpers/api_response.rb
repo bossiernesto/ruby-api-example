@@ -11,8 +11,6 @@ class Api
             status 403
           when :not_found
             status 404
-          when :invalid, :unprocessable_entity
-              status 422
           else
             status 400
         end

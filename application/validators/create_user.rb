@@ -7,7 +7,7 @@ class Api
         required(:password).filled(:str?)
         required(:email).filled(:str?, :email?)
 
-        optional(:born_on).maybe(:str?, :datetime_str?)
+        optional(:born_on).maybe(:date?)
       end
     end
   end

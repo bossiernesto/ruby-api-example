@@ -4,7 +4,7 @@ class Api
   module Models
     class User < Sequel::Model(:users)
       include AbilityList::Helpers
-      plugin :secure_password
+      plugin :secure_password, include_validations: false
 
       def abilities
         @abilities ||= Abilities.new(self)

@@ -26,3 +26,4 @@ if current_task['spec']
 else
   Dir["./application/tasks/**/*.rake"].each  { |rb| import rb }
 end
+

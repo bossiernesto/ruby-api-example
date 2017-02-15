@@ -1,27 +1,41 @@
 class Api
   module Exceptions
 
-    class UserNotFound < StandardError
+    class ApiBaseError < StandardError
+      attr_accessor :errors
 
-    end
-
-    class ValidationError < StandardError
-
-      attr_accessor :validation_errors
-
-      def initialize(msg, validation_errors={})
-        self.validation_errors = validation_errors
+      def initialize(msg, errors={})
+        self.errors = errors
         super msg
       end
 
     end
 
-    class UnauthorizedUser < StandardError
+    class UserNotFound < ApiBaseError
+      def initialize(msg='User not Found', errors={})
+        super msg, errors
+      end
 
     end
 
-    class CantEditUser < StandardError
+    class ValidationError < ApiBaseError
+      def initialize(msg='Validation Errors', errors={})
+        super msg, errors
+      end
 
+    end
+
+    class UnauthorizedUser < ApiBaseError
+      def initialize(msg='Unauthorized User', errors={})
+        super msg, errors
+      end
+
+    end
+
+    class CantEditUser < ApiBaseError
+      def initialize(msg='Unauthorized User', errors={})
+        super msg, errors
+      end
     end
   end
 end

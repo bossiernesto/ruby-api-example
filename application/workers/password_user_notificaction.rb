@@ -1,7 +1,7 @@
 class Api
   module Workers
     class PasswordUserNotification
-      include Sidekiq::Worker
+      include ::Sidekiq::Worker
 
       def perform(user_id)
         user = Backend::UserBackend.get_user user_id

@@ -1,5 +1,7 @@
 Sequel.migration do
   change do
-    rename_column :users, :password, :password_digest
+    alter_table(:users) do
+      rename_column :password, :password_digest
+    end
   end
 end
