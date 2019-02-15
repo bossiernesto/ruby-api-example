@@ -14,6 +14,7 @@ require 'bundler'
 Bundler.setup :default, RACK_ENV
 require 'rack/indifferent'
 require 'grape'
+require 'grape-swagger'
 require 'grape/batch'
 
 # Initialize the application so we can add all our components to it
@@ -113,5 +114,5 @@ class Api < Grape::API
   Dir['./application/api_entities/**/*.rb'].each { |rb| require rb }
   Dir['./application/api/**/*.rb'].each { |rb| require rb }
 
-  # add_swagger_documentation mount_path: '/docs'
+  add_swagger_documentation mount_path: '/docs'
 end
